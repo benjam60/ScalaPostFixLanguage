@@ -1,11 +1,13 @@
 package ScalaPostFixLanguage
 
+import ScalaPostFixLanguage.PostFixInterpreter._
 import org.scalatest.{FreeSpec, Matchers}
 
-class PostFixInterpreterSpec extends FreeSpec {
+class PostFixInterpreterSpec extends FreeSpec with Matchers {
 
-	"Takes in two numbers to add" in {
-		val programText = "0 0 add"
+	"Parses correctly" in {
+		val programText = "(postfix 1 1 add)"
+		PostFixInterpreter.parse(programText) shouldBe List(ParsedInt(1), ParsedInt(1), ParsedCommand("add"))
 	}
 
 }
