@@ -31,11 +31,17 @@ object PostFixInterpreter {
 				case _ => throw new RuntimeException("Invalid for arguments for a binary operations")
 			}
 		}
-			else if (cmd == "exec") {
+		else if (cmd == "exec") {
 			stack match {
 				case ExecutableSequence(first)::rest => IntValue(run(first))::rest
 				case _ => throw new RuntimeException("Invalid for arguments for a binary operations")
 			}
+		}
+		else if (cmd == "nget") {
+			val index = stack.head.asInstanceOf[IntValue].get//1 indexed
+			val rest = stack.tail
+			val sizeOfRest = rest.length
+			rest(sizeOfRest - index) :: rest
 		}
 	 else throw new RuntimeException("Not implemented")
 
