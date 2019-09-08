@@ -25,7 +25,7 @@ object PostFixInterpreter {
 	}
 
 	private def runCommand(cmd : String, stack : List[StackValue]) : List[StackValue] =
-		if (List("add", "swap").contains(cmd)) {
+		if (List("add", "swap", "mul", "sub").contains(cmd)) {
 			stack match {
 				case IntValue(first)::IntValue(second)::_ => executeBinaryCommand(cmd, first, second, stack)
 				case _ => throw new RuntimeException("Invalid for arguments for a binary operations")
@@ -41,8 +41,10 @@ object PostFixInterpreter {
 
 	private def executeBinaryCommand(cmd : String, firstArg : Int, secondArg : Int,
 	                                 stack : List[StackValue]) : List[StackValue] = cmd match {
-		case "add" => IntValue(firstArg + secondArg)::stack
+		case "add" => IntValue(secondArg + firstArg)::stack
 		case "swap" => IntValue(secondArg)::IntValue(firstArg)::stack
+		case "sub" => IntValue(secondArg - firstArg)::stack
+		case "mul" => IntValue(secondArg * firstArg)::stack
 		case _ => throw new RuntimeException("Not implemented")
 	}
 

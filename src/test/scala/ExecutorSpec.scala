@@ -40,4 +40,9 @@ class ExecutorSpec extends FreeSpec with Matchers {
 		PostFixInterpreter.run(programText) shouldBe 9
 	}
 
+	"Complex ops with others" in {
+		val programText = "(postfix 4 2 sub 2 mul)"
+		PostFixInterpreter.run(programText) shouldBe 4
+	}
+
 }
