@@ -39,7 +39,11 @@ object PostFixInterpreter {
 				val closingIndex = getClosingParenethesisIndex(input)
 				val (executableSequence, rest) = input.splitAt(closingIndex + 1)
 				List(executableSequence, rest)
-			case openIndex if openIndex > 0 => throw new RuntimeException("not implemented yet")
+			case openIndex if openIndex > 0 =>
+				val (cmds, cmdseqandrest) = input.splitAt(openIndex)
+				val closingIndex = getClosingParenethesisIndex(cmdseqandrest)
+				val (cmdseq, rest) = cmdseqandrest.splitAt(closingIndex + 1)
+				List(cmds.trim, cmdseq.trim, rest.trim)
 			case NotFound => List(input)
 		}
 	}
