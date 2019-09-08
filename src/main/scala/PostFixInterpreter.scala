@@ -20,7 +20,7 @@ object PostFixInterpreter {
 	def parse(program : String): Seq[ParsedValue] = {
 		val removeHeader = stripWrappingParens(program).replaceFirst("postfix ", "")
 		val topLevelCmdsAndSeq = breakUp(removeHeader)
-		topLevelCmdsAndSeq.flatMap { elt =>
+		topLevelCmdsAndSeq.filter(_ != "")flatMap { elt =>
 			if (elt(0) == '(')
 				List(ParsedCommandSequence(stripWrappingParens(elt)))
 			else
@@ -38,12 +38,12 @@ object PostFixInterpreter {
 			case openIndex if openIndex == 0 =>
 				val closingIndex = getClosingParenethesisIndex(input)
 				val (executableSequence, rest) = input.splitAt(closingIndex + 1)
-				List(executableSequence, rest)
+				List(executableSequence) ++ breakUp(rest)
 			case openIndex if openIndex > 0 =>
 				val (cmds, cmdseqandrest) = input.splitAt(openIndex)
 				val closingIndex = getClosingParenethesisIndex(cmdseqandrest)
 				val (cmdseq, rest) = cmdseqandrest.splitAt(closingIndex + 1)
-				List(cmds.trim, cmdseq.trim, rest.trim)
+				List(cmds.trim, cmdseq.trim) ++ breakUp(rest.trim)
 			case NotFound => List(input)
 		}
 	}

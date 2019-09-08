@@ -27,4 +27,22 @@ class PostFixInterpreterSpec extends FreeSpec with Matchers {
 		PostFixInterpreter.parse(programText) shouldBe
 			List(ParsedInt(1), ParsedCommandSequence("1 1 add"), ParsedCommand("add"))
 	}
+
+	"Parses many nested things" in {
+		val programText = "(postfix 1 ((1 1 add) (1) add) add)"
+		PostFixInterpreter.parse(programText) shouldBe
+			List(ParsedInt(1), ParsedCommandSequence("(1 1 add) (1) add"), ParsedCommand("add"))
+	}
+
+	"Parses all nested arguments" in {
+		val programText = "(postfix (1) (2) add)"
+		PostFixInterpreter.parse(programText) shouldBe
+			List(ParsedCommandSequence("1"), ParsedCommandSequence("2"), ParsedCommand("add"))
+	}
+
+	"Parses later nested arguments" in {
+		val programText = "(postfix 1 (2) (3) add)"
+		PostFixInterpreter.parse(programText) shouldBe
+			List(ParsedInt(1), ParsedCommandSequence("2"), ParsedCommandSequence("3"), ParsedCommand("add"))
+	}
 }
