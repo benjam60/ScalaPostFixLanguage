@@ -20,18 +20,24 @@ class ExecutorSpec extends FreeSpec with Matchers {
 	}
 
 	"Executes nested commands" in {
-		val programText = "(postfix (1 2 add) 3 add)"
+		val programText = "(postfix (1 2 add) exec 3 add)"
 		PostFixInterpreter.run(programText) shouldBe 6
 	}
 
 	"Executes nested commands more" in {
-		val programText = "(postfix 3 (1 2 add) add)"
+		val programText = "(postfix 3 (1 2 add) exec add)"
 		PostFixInterpreter.run(programText) shouldBe 6
 	}
 
 
 	"Executes all nested args more" in {
-		val programText = "(postfix (2 2 add) (1 2 add) add)"
+		val programText = "(postfix (2 2 add) exec (1 2 add) exec add)"
 		PostFixInterpreter.run(programText) shouldBe 7
 	}
+
+	"Complex ops" in {
+		val programText = "(postfix 1 (2) exec (3) exec swap (4 3 add) exec add)"
+		PostFixInterpreter.run(programText) shouldBe 9
+	}
+
 }

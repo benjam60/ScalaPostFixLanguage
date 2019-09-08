@@ -27,13 +27,17 @@ object PostFixInterpreter {
 	private def runCommand(cmd : String, stack : List[StackValue]) : List[StackValue] =
 		if (List("add", "swap").contains(cmd)) {
 			stack match {
-				case ExecutableSequence(first)::ExecutableSequence(second)::_ => executeBinaryCommand(cmd, run(first), run(second), stack)
-				case IntValue(first)::ExecutableSequence(second)::_ => executeBinaryCommand(cmd, first, run(second), stack)
-				case ExecutableSequence(first)::IntValue(second)::_ => executeBinaryCommand(cmd, run(first), second, stack)
 				case IntValue(first)::IntValue(second)::_ => executeBinaryCommand(cmd, first, second, stack)
+				case _ => throw new RuntimeException("Invalid for arguments for a binary operations")
 			}
 		}
-	else throw new RuntimeException("Not implemented")
+			else if (cmd == "exec") {
+			stack match {
+				case ExecutableSequence(first)::rest => IntValue(run(first))::rest
+				case _ => throw new RuntimeException("Invalid for arguments for a binary operations")
+			}
+		}
+	 else throw new RuntimeException("Not implemented")
 
 	private def executeBinaryCommand(cmd : String, firstArg : Int, secondArg : Int,
 	                                 stack : List[StackValue]) : List[StackValue] = cmd match {
