@@ -13,9 +13,10 @@ object PostFixInterpreter {
 			val element = tokens.head
 			if (element(0).isDigit) executeTokens(tokens.tail, element(0).asDigit :: stack)
 			else {
-				element match {
-					case "pop" => executeTokens(tokens.tail, stack.tail)
-					case _ => throw new RuntimeException("No known method")
+				(element, stack) match {
+					case ("pop", _) => executeTokens(tokens.tail, stack.tail)
+					case ("swap", x1::x2::xs) => executeTokens(tokens.tail, x2::x1::xs)
+					case _ => throw new RuntimeException("No known method or stack size is wrong")
 				}
 			}
 		} else stack.head.toString
