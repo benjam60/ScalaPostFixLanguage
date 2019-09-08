@@ -14,4 +14,14 @@ class ExecutorSpec extends FreeSpec with Matchers {
 		PostFixInterpreter.run(programText) shouldBe 3
 	}
 
+	"Executes only stack pushes correctly" in {
+		val programText = "(postfix 1 2 3 4)"
+		PostFixInterpreter.run(programText) shouldBe 4
+	}
+
+	"Executes nested commands" in {
+		val programText = "(postfix (1 2 add) 3 add)"
+		PostFixInterpreter.run(programText) shouldBe 6
+	}
+
 }

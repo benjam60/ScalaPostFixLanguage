@@ -21,11 +21,14 @@ object PostFixInterpreter {
 		case Nil => stack.head.asInstanceOf[IntValue].get
 		case ParsedInt(value):: restOfParsed => runProgram(restOfParsed, IntValue(value)::stack)
 		case ParsedCommand(cmd):: restOfParsed => runProgram(restOfParsed, runCommand(cmd, stack))
-		case _ => -1
+		case ParsedCommandSequence(cmdSeq):: restOfParsed => runProgram(restOfParsed, ExecutableSequence(cmdSeq) :: stack)
 	}
 
 	private def runCommand(cmd : String, stack : List[StackValue]) : List[StackValue] = (cmd, stack) match {
 		case ("add", IntValue(first)::IntValue(second)::rest) => IntValue(first + second) :: rest
+		case ("add", IntValue(first)::ExecutableSequence(second)::rest) =>
+			val res = run(second )
+			IntValue(res + first) :: rest
 		case ("swap", first::second::rest) => second :: first :: rest
 		case _ => throw new RuntimeException("Not implemented")
 	}
@@ -35,7 +38,7 @@ object PostFixInterpreter {
 		val topLevelCmdsAndSeq = breakUp(removeHeader)
 		topLevelCmdsAndSeq.filter(_ != "")flatMap { elt =>
 			if (elt(0) == '(')
-				List(ParsedCommandSequence(stripWrappingParens(elt)))
+				List(ParsedCommandSequence(elt))
 			else
 				parseWithoutCommandSequence(elt)  }
 	}
