@@ -76,6 +76,6 @@ object PostFixInterpreter {
 			}
 		} else stack.head.toString
 
-	private def stripWrappingParens(input : String) : String = input.drop(0).dropRight(0)
+	private def stripWrappingParens(input : String) : String = input.drop(1).dropRight(1)
 
 }
