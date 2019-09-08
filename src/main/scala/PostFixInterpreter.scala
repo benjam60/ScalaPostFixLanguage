@@ -24,12 +24,21 @@ object PostFixInterpreter {
 		case ParsedCommandSequence(cmdSeq):: restOfParsed => runProgram(restOfParsed, ExecutableSequence(cmdSeq) :: stack)
 	}
 
-	private def runCommand(cmd : String, stack : List[StackValue]) : List[StackValue] = (cmd, stack) match {
-		case ("add", IntValue(first)::IntValue(second)::rest) => IntValue(first + second) :: rest
-		case ("add", IntValue(first)::ExecutableSequence(second)::rest) =>
-			val res = run(second )
-			IntValue(res + first) :: rest
-		case ("swap", first::second::rest) => second :: first :: rest
+	private def runCommand(cmd : String, stack : List[StackValue]) : List[StackValue] =
+		if (List("add", "swap").contains(cmd)) {
+			stack match {
+				case ExecutableSequence(first)::ExecutableSequence(second)::_ => executeBinaryCommand(cmd, run(first), run(second), stack)
+				case IntValue(first)::ExecutableSequence(second)::_ => executeBinaryCommand(cmd, first, run(second), stack)
+				case ExecutableSequence(first)::IntValue(second)::_ => executeBinaryCommand(cmd, run(first), second, stack)
+				case IntValue(first)::IntValue(second)::_ => executeBinaryCommand(cmd, first, second, stack)
+			}
+		}
+	else throw new RuntimeException("Not implemented")
+
+	private def executeBinaryCommand(cmd : String, firstArg : Int, secondArg : Int,
+	                                 stack : List[StackValue]) : List[StackValue] = cmd match {
+		case "add" => IntValue(firstArg + secondArg)::stack
+		case "swap" => IntValue(secondArg)::IntValue(firstArg)::stack
 		case _ => throw new RuntimeException("Not implemented")
 	}
 
