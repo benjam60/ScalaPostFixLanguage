@@ -55,4 +55,9 @@ class ExecutorSpec extends FreeSpec with Matchers {
 		PostFixInterpreter.run(programText) shouldBe 5
 	}
 
+	"Squaring program" in {
+		val programText = "(postfix 8 1 nget mul)"
+		PostFixInterpreter.run(programText) shouldBe 64
+	}
+
 }
