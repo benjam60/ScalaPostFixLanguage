@@ -1,38 +1,23 @@
 package ScalaPostFixLanguage
 
-import scala.collection.immutable.Stack
-import scala.collection.immutable.Queue
-
 object PostFixInterpreter {
 
-	def run(programText : String) : String = {
-		val tokens = programText.split("\\s+").toList
-		runProgram(tokens)
+	def run(program : String) : String = {
+		val tokens = program.split("\\s+").toList
+		val stack = List[Int]()
+		executeTokens(tokens, stack)
 	}
 
-	def runProgram(rest : List[String]) : String =
-		if (!rest.contains(addOperatorToken)) rest.mkString(" ")
-	  else {
-			val (cmd, rest1) = parseCommand(rest)
-			val result = executeCommand(cmd)
-			runProgram(result::rest1)
-		}
-
-	def parseCommand(tokens : List[String]) : (Command, List[String]) = {
-		val argsToken = tokens.takeWhile(_ != addOperatorToken)
-		val operatorToken = tokens.dropWhile(_ != addOperatorToken).head
-		val restOfCommands = tokens.dropWhile(_ != addOperatorToken).drop(1)
-		(Command(argsToken, OperatorToken(operatorToken)), restOfCommands)
-	}
-
-	def executeCommand(command: Command) : String = {
-		""
-	}
-
-	val addOperatorToken = "+"
-
-	case class Command(arguments : List[String], operatorToken: OperatorToken)
-
-	case class OperatorToken(get : String) extends AnyVal
+	def executeTokens(tokens : List[String], stack : List[Int]): String =
+		if (tokens.nonEmpty) {
+			val element = tokens.head
+			if (element(0).isDigit) executeTokens(tokens.tail, element(0).asDigit :: stack)
+			else {
+				element match {
+					case "pop" => executeTokens(tokens.tail, stack.tail)
+					case _ => throw new RuntimeException("No known method")
+				}
+			}
+		} else stack.head.toString
 
 }
