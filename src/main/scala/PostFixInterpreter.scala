@@ -11,13 +11,26 @@ object PostFixInterpreter {
 	case class IntValue(get : Int) extends StackValue
 	case class ExecutableSequence(get : String) extends StackValue
 
-	def run(program : String) : String = {
-		val tokens = program.split("\\s+").toList
+	def run(program : String) : Int = {
+		val parsedProgram = parse(program)
 		val stack = List[StackValue]()
-		executeTokens(tokens, stack)
+		runProgram(parsedProgram, stack)
 	}
 
-	def parse(program : String): Seq[ParsedValue] = {
+	private def runProgram(parsedProgram : List[ParsedValue], stack : List[StackValue]) : Int = parsedProgram match {
+		case Nil => stack.head.asInstanceOf[IntValue].get
+		case ParsedInt(value):: restOfParsed => runProgram(restOfParsed, IntValue(value)::stack)
+		case ParsedCommand(cmd):: restOfParsed => runProgram(restOfParsed, runCommand(cmd, stack))
+		case _ => -1
+	}
+
+	private def runCommand(cmd : String, stack : List[StackValue]) : List[StackValue] = (cmd, stack) match {
+		case ("add", IntValue(first)::IntValue(second)::rest) => IntValue(first + second) :: rest
+		case ("swap", first::second::rest) => second :: first :: rest
+		case _ => throw new RuntimeException("Not implemented")
+	}
+
+	def parse(program : String): List[ParsedValue] = {
 		val removeHeader = stripWrappingParens(program).replaceFirst("postfix ", "")
 		val topLevelCmdsAndSeq = breakUp(removeHeader)
 		topLevelCmdsAndSeq.filter(_ != "")flatMap { elt =>
@@ -31,7 +44,7 @@ object PostFixInterpreter {
 		input.trim.split("\\s+").map { elt =>
 			if (elt(0).isDigit) ParsedInt(elt(0).asDigit) else ParsedCommand(elt) }.toList
 
-	def breakUp(input : String) : List[String] = {
+	private def breakUp(input : String) : List[String] = {
 		val maybeOpenParensIndex = input.indexOf('(')
 		val NotFound = -1
 		maybeOpenParensIndex match {
@@ -48,7 +61,7 @@ object PostFixInterpreter {
 		}
 	}
 
-	def getClosingParenethesisIndex(input : String) : Int = {
+	private def getClosingParenethesisIndex(input : String) : Int = {
 
 		def traverse(input : String, currIndex : Int, numOpen : Int, numClosed : Int) : Int = {
 			if (numOpen == numClosed) { currIndex }
@@ -65,21 +78,6 @@ object PostFixInterpreter {
 		traverse(input.drop(0), currIndex = 0, numOpen = 1, numClosed = 0)
 
 	}
-
-	def executeTokens(tokens : List[String], stack : List[StackValue]): String =
-		if (tokens.nonEmpty) {
-			val element = tokens.head
-			if (element(0).isDigit) executeTokens(tokens.tail, IntValue(element(0).asDigit) :: stack)
-			else {
-				(element, stack) match {
-					case ("pop", _) => executeTokens(tokens.tail, stack.tail)
-					case ("swap", x1::x2::xs) => executeTokens(tokens.tail, x2::x1::xs)
-					case ("exec", _) => ""
-					case _ => throw new RuntimeException("No known method or stack size is wrong")
-				}
-			}
-		} else stack.head.toString
-
 	private def stripWrappingParens(input : String) : String = input.drop(1).dropRight(1)
 
 }

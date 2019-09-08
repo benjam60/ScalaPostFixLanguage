@@ -3,7 +3,7 @@ package ScalaPostFixLanguage
 import ScalaPostFixLanguage.PostFixInterpreter._
 import org.scalatest.{FreeSpec, Matchers}
 
-class PostFixInterpreterSpec extends FreeSpec with Matchers {
+class ParserSpec extends FreeSpec with Matchers {
 
 	"Parses basic add correctly" in {
 		val programText = "(postfix 1 1 add)"
