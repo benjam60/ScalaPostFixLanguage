@@ -11,9 +11,8 @@ object PostFixInterpreter {
 	case class IntValue(get : Int) extends StackValue
 	case class ExecutableSequence(get : String) extends StackValue
 
-	def run(program : String) : Int = {
+	def run(program : String, stack : List[StackValue] = List.empty[StackValue]) : Int = {
 		val parsedProgram = parse(program)
-		val stack = List[StackValue]()
 		runProgram(parsedProgram, stack)
 	}
 
@@ -33,7 +32,7 @@ object PostFixInterpreter {
 		}
 		else if (cmd == "exec") {
 			stack match {
-				case ExecutableSequence(first)::rest => IntValue(run(first))::rest
+				case ExecutableSequence(first)::rest => IntValue(run(first, rest))::rest
 				case _ => throw new RuntimeException("Invalid for arguments for a binary operations")
 			}
 		}
